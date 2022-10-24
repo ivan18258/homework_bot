@@ -45,14 +45,17 @@ def get_api_answer(current_timestamp):
     )
     try:
         homework_statuses = requests.get(**params)
+        logger.info("Запрос к API выполнен")
     except Exception as error:
         logger.error(f"Ошибка при запросе к API: {error}")
-    else:
+    try:
         if homework_statuses.status_code != HTTPStatus.OK:
             error_message = "Статус страницы не равен 200"
             raise requests.HTTPError(error_message)
         return homework_statuses.json()
-
+    except ValueError:
+        logger.error('Ошибка парсинга ответа из формата json')
+        raise ValueError('Ошибка парсинга ответа из формата json')
 
 def check_response(response):
     """Проверяет полученный ответ на корректность."""
@@ -93,8 +96,7 @@ def parse_status(homework):
 
 def check_tokens():
     """Проверяет доступность переменных."""
-    tokens = all([TELEGRAM_TOKEN, PRACTICUM_TOKEN, TELEGRAM_CHAT_ID])
-    return tokens
+    return all([TELEGRAM_TOKEN, PRACTICUM_TOKEN, TELEGRAM_CHAT_ID])
 
 
 def main():
