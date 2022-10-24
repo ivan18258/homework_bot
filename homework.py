@@ -57,6 +57,7 @@ def get_api_answer(current_timestamp):
         logger.error('Ошибка парсинга ответа из формата json')
         raise ValueError('Ошибка парсинга ответа из формата json')
 
+
 def check_response(response):
     """Проверяет полученный ответ на корректность."""
     logger.info("Ответ от сервера получен")
