@@ -67,8 +67,8 @@ def check_response(response):
     except KeyError:
         logger.error('Ключ "homeworks" отсутствует в словаре')
         raise KeyError('Ключ "homeworks" отсутствует в словаре')
-    if not homeworks_response: 
-        message_status = ("Отсутствует статус homeworks") 
+    if not homeworks_response:
+        message_status = ("Отсутствует статус homeworks")
         raise LookupError(message_status)
     if not isinstance(homeworks_response, list):
         message_list = ("Невернй тип входящих данных")
