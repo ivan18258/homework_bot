@@ -44,8 +44,8 @@ def get_api_answer(current_timestamp):
         params={"from_date": timestamp}
     )
     try:
+        logger.info("Запрос к API")
         homework_statuses = requests.get(**params)
-        logger.info("Запрос к API выполнен")
     except Exception as error:
         logger.error(f"Ошибка при запросе к API: {error}")
     try:
@@ -61,17 +61,18 @@ def get_api_answer(current_timestamp):
 def check_response(response):
     """Проверяет полученный ответ на корректность."""
     logger.info("Ответ от сервера получен")
-    homeworks_response = response['homeworks']
-    logger.info("Список домашних работ получен")
-    if not homeworks_response:
-        message_status = ("Отсутствует статус homeworks")
+    try:
+        homeworks_response = response['homeworks']
+        logger.info("Список домашних работ получен")
+    except KeyError:
+        logger.error('Ключ "homeworks" отсутствует в словаре')
+        raise KeyError('Ключ "homeworks" отсутствует в словаре')
+    if not homeworks_response: 
+        message_status = ("Отсутствует статус homeworks") 
         raise LookupError(message_status)
     if not isinstance(homeworks_response, list):
         message_list = ("Невернй тип входящих данных")
         raise TypeError(message_list)
-    if 'homeworks' not in response.keys():
-        message_homeworks = 'Ключ "homeworks" отсутствует в словаре'
-        raise KeyError(message_homeworks)
     if 'current_date' not in response.keys():
         message_current_date = 'Ключ "current_date" отсутствует в словаре'
         raise KeyError(message_current_date)
@@ -80,7 +81,11 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает статус работы."""
-    homework_name = homework.get("homework_name")
+    try:
+        homework_name = homework.get("homework_name")
+    except KeyError:
+        logger.error("Такого имени не существует")
+        raise KeyError("Такого имени не существует")
     homework_status = homework.get("status")
     verdict = HOMEWORK_VERDICTS[homework_status]
     if not verdict:
@@ -89,9 +94,6 @@ def parse_status(homework):
     if homework_status not in HOMEWORK_VERDICTS:
         message_homework_status = "Такого статуса не существует"
         raise KeyError(message_homework_status)
-    if "homework_name" not in homework:
-        message_homework_name = "Такого имени не существует"
-        raise KeyError(message_homework_name)
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
 
 
